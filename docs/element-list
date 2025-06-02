@@ -1,0 +1,12 @@
+fr.esiea.mali.core
+fr.esiea.mali.core.model.board
+fr.esiea.mali.core.model.move
+fr.esiea.mali.core.model.piece
+fr.esiea.mali.core.model.player
+fr.esiea.mali.core.model.state
+fr.esiea.mali.core.model.state.game
+fr.esiea.mali.core.model.state.history
+fr.esiea.mali.core.model.team
+fr.esiea.mali.core.service.factory
+fr.esiea.mali.core.service.impl
+fr.esiea.mali.core.service.manager

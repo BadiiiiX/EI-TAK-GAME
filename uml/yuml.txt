@@ -1,0 +1,166 @@
+[note: Legend\n aquamarine: Abstract\n blueviolet: Enum\n coral: Record\n chartreuse: Interface]
+
+// ===> MODELS <===
+
+// Board
+
+[<<IBoard>> AbstractBoard{bg:aquamarine}| ﹟ List＜List＜Deque＜IPiece＞＞＞ board; ﹟ BoardSize size; | + Deque＜IPiece＞ getTile(Position); ﹟ List＜List＜Deque＜IPiece＞＞＞ fillBoard()]
+
+[Board| + IBoard copy()]
+
+[<<Enum>> BoardSize{bg:blueviolet}| TINY(3, 10, 0); SMALL(4, 15, 0); MEDIUM(5, 21, 0); LARGE(6, 30, 1); HUGE(8, 50, 2) | - int size; - int initialStone; - int initialCapstones]
+
+[<<Record>> Position{bg:coral}| + int row; + int col | Position translate(int, int)]
+
+// BoardLinks
+[Board]-^[<<IBoard>> AbstractBoard]
+[<<IBoard>> AbstractBoard]++->[<<Enum>> BoardSize]
+[<<IBoard>> AbstractBoard]++->[<<Record>> Position]
+
+
+// Player
+
+[<<IPlayer>> AbstractPlayer{bg:aquamarine}| ﹟ TeamColor color; ﹟String name; ﹟ PlayerInventory inventory;]
+
+[HumanPlayer]
+
+[PlayerInventory| - int captsone; int stone; | + void useCapstone(); +void useStone(); + bool hasCapstone() ; + bool hasStone();]
+
+//PlayerLinks
+[HumanPlayer]-^[<<IPlayer>> AbstractPlayer]
+[<<IPlayer>> AbstractPlayer]++->[PlayerInventory]
+
+
+// Move
+
+[Move| - Position from; - Position to; - int count; - List＜int＞ drops; - bool isCapstone; - bool isStanding; - bool isPlacement | + Move slide(Position, Poisition, int, List＜int＞)]
+
+
+// Piece
+
+[<<IPiece>> AbstractPiece{bg:aquamarine}| ﹟ TeamColor color; ﹟ PieceKind kind; | + void flatten()]
+
+[CapStone]
+
+[Stone]
+
+[<<Enum>> PieceKind{bg:blueviolet}| FLAT; STANDING; CAPSTONE]
+
+//PieceLinks
+[Stone]-^[<<IPiece>> AbstractPiece]
+[CapStone]-^[<<IPiece>> AbstractPiece]
+
+[<<IPiece>> AbstractPiece]++->[<<Enum>> PieceKind]
+
+
+//state/game
+
+[<<interface>> IGameState{bg:chartreuse}]
+[GameState| - IBoard board; - IPlayer currentPlayer; - IHistory history; - IPlayer winner]
+
+//state/gameLinks
+[GameState]-.-^[<<interface>> IGameState]
+
+
+//state/history
+
+[<<interface>> IHistory{bg:chartreuse}| + void record(Move); + Move undo(); + int size()]
+[History| - Deque＜Move＞ moves | + bool canUndo(); ]
+
+//state/historyLinks
+[History]-.-^[<<interface>> IHistory]
+
+
+//team
+
+[<<Enum>> TeamColor{bg:blueviolet}| BLACK(255, 255, 255); WHITE(0, 0, 0)| - int red; - int green; -int blue;]
+
+
+// ===> SERVICES <===
+
+//TurnManager
+
+[TurnManager| - List＜IPlayer＞ players; - int currentIndex; - int turnNumber; + IPlayer nextPlayer(); + previousPlayer();]
+
+//game
+[<<interface>> IGame{bg:chartreuse}| void start(); void PlayMove(Move); void undo();]
+
+[Game| - IBoard board; - IGameState state; - TurnManager turnManager]
+
+//GameLinks
+[Game]-.-^[<<interface>> IGame]
+
+
+//BoardFactory
+[BoardFactory| + Board create(BoardSize)]
+
+//GameFactory
+[GameFactory| + Game create(BoardSize, String, String)]
+
+//PieceFactory
+[PieceFactory| + Stone createStone(TeamColor, PieceKind); + CapStone createCapstone(TeamColor)]
+
+//PlayerFactory
+[PlayerFactory| + HumanPlayer create(String, TeamColor, BoardSize)]
+
+//ExtraLink
+
+
+//--gamestate--
+[<<interface>> IGameState]++->[<<IBoard>> AbstractBoard]
+[<<interface>> IGameState]++->[<<IPlayer>> AbstractPlayer]
+[<<interface>> IGameState]++->[<<interface>> IHistory]
+
+
+// --board--
+[<<IBoard>> AbstractBoard]++->[<<IPiece>> AbstractPiece]
+
+
+//--piece--
+[<<IPiece>> AbstractPiece]++->[<<Enum>> TeamColor]
+
+
+//--player--
+[<<IPlayer>> AbstractPlayer]++->[<<Enum>> TeamColor]
+
+
+//--history--
+[<<interface>> IHistory]++->[Move]
+
+
+//--turnmanager--
+[TurnManager]++->[<<IPlayer>> AbstractPlayer]
+
+
+//--game--
+[<<interface>> IGame]++->[Move]
+[<<interface>> IGame]++->[<<interface>> IGameState]
+[Game]++->[TurnManager]
+[Game]++->[<<IBoard>> AbstractBoard]
+
+
+//--move--
+[Move]++->[<<Record>> Position]
+
+
+//--boardfactory--
+[BoardFactory]<>->[<<Enum>> BoardSize]
+[BoardFactory]<>->[Board] 
+
+
+//--gamefactory--
+[GameFactory]<>->[<<Enum>> BoardSize]
+[GameFactory]<>->[Board] 
+
+
+//--piecefactory--
+[PieceFactory]<>->[<<Enum>> TeamColor]
+[PieceFactory]<>->[<<Enum>> PieceKind]
+[PieceFactory]<>->[Stone]
+[PieceFactory]<>->[CapStone]
+
+
+//--playerfactory--
+[PlayerFactory]<>->[HumanPlayer]
+[PlayerFactory]<>->[<<Enum>> PieceKind]
+[PlayerFactory]<>->[<<Enum>> BoardSize]
