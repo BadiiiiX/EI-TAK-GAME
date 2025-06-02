@@ -6,9 +6,9 @@ sync_to_github:
   script:
     - git config --global user.email "contact@mehdi-ali.me"
     - git config --global user.name "BadiiiX"
+    - git clone --mirror https://oauth2:$GITLAB_TOKEN@gitlab.esiea.fr/mali/tak.git repo-mirror
+    - cd repo-mirror
     - git remote add github https://$GITHUB_TOKEN@github.com/BadiiiiX/EI-TAK-GAME.git
-    - git fetch origin --prune
-    - git push github --all
-    - git push github --tags
+    - git push --mirror github
   only:
     - master
