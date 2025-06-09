@@ -1,5 +1,7 @@
 package fr.esiea.mali.core.service.impl;
 
+import fr.esiea.mali.core.event.EventBus;
+import fr.esiea.mali.core.event.events.GameStartedEvent;
 import fr.esiea.mali.core.model.board.IBoard;
 import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.player.IPlayer;
@@ -12,16 +14,19 @@ public class Game implements IGame {
     private final IBoard board;
     private IGameState state;
     private final TurnManager turnManager;
+    private final EventBus bus;
 
-    public Game(IBoard board, TurnManager turnManager) {
+    public Game(IBoard board, TurnManager turnManager, EventBus bus) {
         this.board = board;
         this.turnManager = turnManager;
         this.state = null;
+        this.bus = bus;
     }
 
     @Override
     public void start() {
         this.state = new GameState(board.copy(), turnManager.getCurrentPlayer());
+        bus.post(new GameStartedEvent(this.getState()));
     }
 
     @Override

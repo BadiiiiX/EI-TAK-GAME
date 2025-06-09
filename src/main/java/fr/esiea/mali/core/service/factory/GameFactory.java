@@ -1,5 +1,6 @@
 package fr.esiea.mali.core.service.factory;
 
+import fr.esiea.mali.core.event.EventBus;
 import fr.esiea.mali.core.model.board.Board;
 import fr.esiea.mali.core.model.board.BoardSize;
 import fr.esiea.mali.core.model.player.HumanPlayer;
@@ -21,8 +22,9 @@ public class GameFactory {
         HumanPlayer secondPlayer = PlayerFactory.create(secondPlayerName, TeamColor.BLACK, size);
 
         TurnManager turnManager = new TurnManager(Arrays.asList(firstPlayer, secondPlayer));
+        EventBus  eventBus = new EventBus();
 
-        return new Game(board, turnManager);
+        return new Game(board, turnManager, eventBus);
     }
 
 }

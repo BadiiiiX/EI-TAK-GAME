@@ -4,31 +4,31 @@
 
 // Board
 
-[<<IBoard>> AbstractBoard{bg:aquamarine}| ﹟ List＜List＜Deque＜IPiece＞＞＞ board; ﹟ BoardSize size; | + Deque＜IPiece＞ getTile(Position); ﹟ List＜List＜Deque＜IPiece＞＞＞ fillBoard()]
+[≪IBoard≫;AbstractBoard{bg:aquamarine}| ﹟ List＜List＜Deque＜IPiece＞＞＞ board; ﹟ BoardSize size; | + Deque＜IPiece＞ getTile(Position); ﹟ List＜List＜Deque＜IPiece＞＞＞ fillBoard()]
 
 [Board| + IBoard copy()]
 
-[<<Enum>> BoardSize{bg:blueviolet}| TINY(3, 10, 0); SMALL(4, 15, 0); MEDIUM(5, 21, 0); LARGE(6, 30, 1); HUGE(8, 50, 2) | - int size; - int initialStone; - int initialCapstones]
+[≪Enum≫;BoardSize{bg:blueviolet}| TINY(3, 10, 0); SMALL(4, 15, 0); MEDIUM(5, 21, 0); LARGE(6, 30, 1); HUGE(8, 50, 2) | - int size; - int initialStone; - int initialCapstones]
 
-[<<Record>> Position{bg:coral}| + int row; + int col | Position translate(int, int)]
+[≪Record≫;Position{bg:coral}| + int row; + int col | Position translate(int, int)]
 
 // BoardLinks
-[Board]-^[<<IBoard>> AbstractBoard]
-[<<IBoard>> AbstractBoard]++->[<<Enum>> BoardSize]
-[<<IBoard>> AbstractBoard]++->[<<Record>> Position]
+[Board]-^[AbstractBoard]
+[AbstractBoard]++->[BoardSize]
+[AbstractBoard]++->[Position]
 
 
 // Player
 
-[<<IPlayer>> AbstractPlayer{bg:aquamarine}| ﹟ TeamColor color; ﹟String name; ﹟ PlayerInventory inventory;]
+[≪IPlayer≫;AbstractPlayer{bg:aquamarine}| ﹟ TeamColor color; ﹟String name; ﹟ PlayerInventory inventory;]
 
 [HumanPlayer]
 
 [PlayerInventory| - int captsone; int stone; | + void useCapstone(); +void useStone(); + bool hasCapstone() ; + bool hasStone();]
 
 //PlayerLinks
-[HumanPlayer]-^[<<IPlayer>> AbstractPlayer]
-[<<IPlayer>> AbstractPlayer]++->[PlayerInventory]
+[HumanPlayer]-^[AbstractPlayer]
+[AbstractPlayer]++->[PlayerInventory]
 
 
 // Move
@@ -38,42 +38,62 @@
 
 // Piece
 
-[<<IPiece>> AbstractPiece{bg:aquamarine}| ﹟ TeamColor color; ﹟ PieceKind kind; | + void flatten()]
+[≪IPiece≫;AbstractPiece{bg:aquamarine}| ﹟ TeamColor color; ﹟ PieceKind kind; | + void flatten()]
 
 [CapStone]
 
 [Stone]
 
-[<<Enum>> PieceKind{bg:blueviolet}| FLAT; STANDING; CAPSTONE]
+[≪Enum≫;PieceKind{bg:blueviolet}| FLAT; STANDING; CAPSTONE]
 
 //PieceLinks
-[Stone]-^[<<IPiece>> AbstractPiece]
-[CapStone]-^[<<IPiece>> AbstractPiece]
+[Stone]-^[AbstractPiece]
+[CapStone]-^[AbstractPiece]
 
-[<<IPiece>> AbstractPiece]++->[<<Enum>> PieceKind]
+[AbstractPiece]++->[PieceKind]
 
 
 //state/game
 
-[<<interface>> IGameState{bg:chartreuse}]
+[≪Interface≫;IGameState{bg:chartreuse}]
 [GameState| - IBoard board; - IPlayer currentPlayer; - IHistory history; - IPlayer winner]
 
 //state/gameLinks
-[GameState]-.-^[<<interface>> IGameState]
+[IGameState]^-.-[GameState]
 
 
 //state/history
 
-[<<interface>> IHistory{bg:chartreuse}| + void record(Move); + Move undo(); + int size()]
+[≪Interface≫;IHistory{bg:chartreuse}| + void record(Move); + Move undo(); + int size()]
 [History| - Deque＜Move＞ moves | + bool canUndo(); ]
 
 //state/historyLinks
-[History]-.-^[<<interface>> IHistory]
+[History]-.-^[IHistory]
 
 
 //team
 
-[<<Enum>> TeamColor{bg:blueviolet}| BLACK(255, 255, 255); WHITE(0, 0, 0)| - int red; - int green; -int blue;]
+[≪Enum≫;TeamColor{bg:blueviolet}| BLACK(255, 255, 255); WHITE(0, 0, 0)| - int red; - int green; -int blue;]
+
+
+// ===> EVENT <===
+
+//Event
+[≪Interface≫;IEvent{bg:chartreuse}]
+
+
+//EventBus
+[EventBus| - Map＜Class＜IEvent＞, List＜Fn＜IEvent＞＞＞ listeners| + void register(IEvent, Fn＜IEvent＞); + void post(IEvent)]
+
+
+//events
+[≪Record≫;GameStartedEvent{bg:coral}| + IGameState gameState]
+[≪Record≫;GameEndedEvent{bg:coral}| + IGameState gameState]
+
+//EventLinks
+[GameStartedEvent]-.-^[IEvent]
+[GameEndedEvent]-.-^[IEvent]
+[EventBus]<>->[IEvent]
 
 
 // ===> SERVICES <===
@@ -83,12 +103,12 @@
 [TurnManager| - List＜IPlayer＞ players; - int currentIndex; - int turnNumber; + IPlayer nextPlayer(); + previousPlayer();]
 
 //game
-[<<interface>> IGame{bg:chartreuse}| void start(); void PlayMove(Move); void undo();]
+[≪Interface≫;IGame{bg:chartreuse}| void start(); void PlayMove(Move); void undo();]
 
 [Game| - IBoard board; - IGameState state; - TurnManager turnManager]
 
 //GameLinks
-[Game]-.-^[<<interface>> IGame]
+[Game]-.-^[IGame]
 
 
 //BoardFactory
@@ -107,60 +127,67 @@
 
 
 //--gamestate--
-[<<interface>> IGameState]++->[<<IBoard>> AbstractBoard]
-[<<interface>> IGameState]++->[<<IPlayer>> AbstractPlayer]
-[<<interface>> IGameState]++->[<<interface>> IHistory]
+[IGameState]++->[AbstractBoard]
+[IGameState]++->[AbstractPlayer]
+[IGameState]++->[IHistory]
 
 
 // --board--
-[<<IBoard>> AbstractBoard]++->[<<IPiece>> AbstractPiece]
+[AbstractBoard]++->[AbstractPiece]
 
 
 //--piece--
-[<<IPiece>> AbstractPiece]++->[<<Enum>> TeamColor]
+[AbstractPiece]++->[TeamColor]
 
 
 //--player--
-[<<IPlayer>> AbstractPlayer]++->[<<Enum>> TeamColor]
+[AbstractPlayer]++->[TeamColor]
 
 
 //--history--
-[<<interface>> IHistory]++->[Move]
+[IHistory]++->[Move]
 
 
 //--turnmanager--
-[TurnManager]++->[<<IPlayer>> AbstractPlayer]
+[TurnManager]++->[AbstractPlayer]
 
 
 //--game--
-[<<interface>> IGame]++->[Move]
-[<<interface>> IGame]++->[<<interface>> IGameState]
+[IGame]++->[Move]
+[IGame]++->[IGameState]
 [Game]++->[TurnManager]
-[Game]++->[<<IBoard>> AbstractBoard]
+[Game]++->[EventBus]
+[Game]++->[AbstractBoard]
+[Game]++>[GameStartedEvent]
 
 
 //--move--
-[Move]++->[<<Record>> Position]
+[Move]++->[Position]
 
 
 //--boardfactory--
-[BoardFactory]<>->[<<Enum>> BoardSize]
-[BoardFactory]<>->[Board] 
+[BoardFactory]<>->[BoardSize]
+[BoardFactory]<>->[Board]
 
 
 //--gamefactory--
-[GameFactory]<>->[<<Enum>> BoardSize]
-[GameFactory]<>->[Board] 
+[GameFactory]<>->[BoardSize]
+[GameFactory]<>->[Board]
 
 
 //--piecefactory--
-[PieceFactory]<>->[<<Enum>> TeamColor]
-[PieceFactory]<>->[<<Enum>> PieceKind]
+[PieceFactory]<>->[TeamColor]
+[PieceFactory]<>->[PieceKind]
 [PieceFactory]<>->[Stone]
 [PieceFactory]<>->[CapStone]
 
 
 //--playerfactory--
 [PlayerFactory]<>->[HumanPlayer]
-[PlayerFactory]<>->[<<Enum>> PieceKind]
-[PlayerFactory]<>->[<<Enum>> BoardSize]
+[PlayerFactory]<>->[PieceKind]
+[PlayerFactory]<>->[BoardSize]
+
+
+//--events
+[GameStartedEvent]<>->[IGameState]
+[GameEndedEvent]<>->[IGameState]
