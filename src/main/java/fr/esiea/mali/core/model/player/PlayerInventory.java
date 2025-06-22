@@ -5,7 +5,7 @@ public class PlayerInventory {
     private int capstone;
     private int stone;
 
-    public PlayerInventory( int stone, int capstone) {
+    public PlayerInventory(int stone, int capstone) {
         this.stone = stone;
         this.capstone = capstone;
     }
@@ -38,4 +38,11 @@ public class PlayerInventory {
         return this.capstone > 0;
     }
 
+    public void refundCapstone() {
+        this.capstone++;
+    }
+
+    public void refundStone() {
+        this.stone++;
+    }
 }

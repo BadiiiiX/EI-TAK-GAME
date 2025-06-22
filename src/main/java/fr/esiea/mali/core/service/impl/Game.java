@@ -7,17 +7,20 @@ import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.player.IPlayer;
 import fr.esiea.mali.core.model.state.game.GameState;
 import fr.esiea.mali.core.model.state.game.IGameState;
+import fr.esiea.mali.core.rule.engine.RuleEngine;
 import fr.esiea.mali.core.service.manager.TurnManager;
 
 public class Game implements IGame {
 
     private final IBoard board;
     private IGameState state;
+    private final RuleEngine ruleEngine;
     private final TurnManager turnManager;
     private final EventBus bus;
 
-    public Game(IBoard board, TurnManager turnManager, EventBus bus) {
+    public Game(IBoard board, RuleEngine ruleEngine, TurnManager turnManager, EventBus bus) {
         this.board = board;
+        this.ruleEngine = ruleEngine;
         this.turnManager = turnManager;
         this.state = null;
         this.bus = bus;
@@ -33,6 +36,7 @@ public class Game implements IGame {
     public void playMove(Move move) {
 
         //TODO PROCESS PLAY (validation, board process...)
+        ruleEngine.processMove(state, move);
 
         state.getHistory().record(move);
 
@@ -51,17 +55,15 @@ public class Game implements IGame {
         IPlayer prev = turnManager.previousPlayer();
         state.setCurrentPlayer(prev);
 
-        //TODO refund methods
         if (last.isCapstoneMove()) {
-            //prev.getInventory().refundCapstone();
+            prev.getInventory().refundCapstone();
         } else {
-            //prev.getInventory().refundStone();
+            prev.getInventory().refundStone();
         }
     }
 
     @Override
     public IGameState getState() {
-        // On retourne une copie pour préserver l’encapsulation
         return state;
     }
 }

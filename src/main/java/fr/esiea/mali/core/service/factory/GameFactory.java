@@ -5,6 +5,8 @@ import fr.esiea.mali.core.model.board.Board;
 import fr.esiea.mali.core.model.board.BoardSize;
 import fr.esiea.mali.core.model.player.HumanPlayer;
 import fr.esiea.mali.core.model.team.TeamColor;
+import fr.esiea.mali.core.rule.engine.RuleEngine;
+import fr.esiea.mali.core.rule.engine.RuleSet;
 import fr.esiea.mali.core.service.impl.Game;
 import fr.esiea.mali.core.service.manager.TurnManager;
 
@@ -16,7 +18,8 @@ public class GameFactory {
 
         Board board = BoardFactory.create(size);
 
-        //TODO Setup RuleSet
+        RuleSet ruleSet = RuleSet.defaultRules();
+        RuleEngine engine = new RuleEngine(ruleSet);
 
         HumanPlayer firstPlayer = PlayerFactory.create(firstPlayerName, TeamColor.WHITE, size);
         HumanPlayer secondPlayer = PlayerFactory.create(secondPlayerName, TeamColor.BLACK, size);
@@ -24,7 +27,7 @@ public class GameFactory {
         TurnManager turnManager = new TurnManager(Arrays.asList(firstPlayer, secondPlayer));
         EventBus  eventBus = new EventBus();
 
-        return new Game(board, turnManager, eventBus);
+        return new Game(board, engine, turnManager, eventBus);
     }
 
 }

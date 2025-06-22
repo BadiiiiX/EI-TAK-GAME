@@ -15,6 +15,6 @@ public interface IGameState {
     IHistory getHistory();
 
     Optional<IPlayer> getWinner();
-    void setWinner(Optional<IPlayer> winner);
+    void setWinner(IPlayer winner);
 
 }

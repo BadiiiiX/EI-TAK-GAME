@@ -25,4 +25,9 @@ public enum TeamColor {
     public int getBlue() {
         return blue;
     }
+
+    @Override
+    public String toString() {
+        return (this.equals(TeamColor.BLACK)) ? "B" : "W";
+    }
 }

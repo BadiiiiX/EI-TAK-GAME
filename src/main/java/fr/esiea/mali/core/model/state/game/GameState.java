@@ -13,19 +13,18 @@ public class GameState implements IGameState {
     private IBoard board;
     private IPlayer currentPlayer;
     private final IHistory history;
-    private Optional<IPlayer> winner;
+    private IPlayer winner = null;
 
     public GameState(IBoard board, IPlayer currentPlayer) {
         this.setBoard(board);
         this.setCurrentPlayer(currentPlayer);
         this.history = new History();
-        this.setWinner(Optional.empty());
     }
 
     private GameState(IBoard board,
                       IPlayer currentPlayer,
                       History history,
-                      Optional<IPlayer> winner) {
+                      IPlayer winner) {
         this.board = board;
         this.currentPlayer = currentPlayer;
         this.history = history;
@@ -56,8 +55,8 @@ public class GameState implements IGameState {
         this.currentPlayer = Objects.requireNonNull(player);
     }
 
-    public void setWinner(Optional<IPlayer> winner) {
-        this.winner = Objects.requireNonNull(winner);
+    public void setWinner(IPlayer winner) {
+        this.winner = winner;
     }
 
 }

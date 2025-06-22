@@ -1,150 +1,130 @@
 package fr.esiea.mali.core.model.move;
 
 import fr.esiea.mali.core.model.board.Position;
+import fr.esiea.mali.core.model.piece.IPiece;
+import fr.esiea.mali.core.model.piece.PieceKind;
+import fr.esiea.mali.core.model.player.IPlayer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-
 /**
- * Représente un coup dans une partie de Tak.
- * Peut être soit : <br>
- *  - un placement : on ajoute une pièce neuve (flat, standing ou capstone) sur une case vide, <br>
- *  - un slide : on déplace une pile depuis une case source vers une ou plusieurs cases cibles (avec découpage).
+ * Représente un coup dans une partie de Tak :
+ * - Placement : pose d’une pièce neuve (flat, standing ou capstone)
+ * - Slide     : déplacement d’une pile (pickup + drops)
  */
 public final class Move {
 
-    private final Position from;
-
-    private final Position to;
-
+    private final IPlayer author;
     /**
-     * Pour un slide : nombre de jetons pris de la pile source. <br>
-     * Pour un placement : toujours 1 (le nombre de pièces neuves déposées).
+     * Source du slide (null pour un placement).
+     */
+    private final Position from;
+    /**
+     * Cible du placement ou première case du slide.
+     */
+    private final Position to;
+    /**
+     * Nombre de pièces déplacées ou posées (1 pour un placement).
      */
     private final int count;
-
     /**
-     * Pour un slide : liste des quantités déposées case par case le long de la direction. <br>
-     * Ex. : [2, 1] signifie qu’on dépose 2 jetons sur la première case, puis 1 jeton sur la seconde, etc... <br>
-     * Pour un placement : vide.
+     * Séquence des dépôts pour un slide (vide pour un placement).
      */
     private final List<Integer> drops;
+    /**
+     * Type de placement, ou null si slide.
+     */
+    private final PieceKind placementType;
 
-    private final boolean isCapstone;
-
-    private final boolean isStanding;
-
-    private final boolean isPlacement;
-
-
-    private Move(Position from,
-                 Position to,
-                 int count,
-                 List<Integer> drops,
-                 boolean isCapstone,
-                 boolean isStanding,
-                 boolean isPlacement) {
-        if (to == null) {
-            throw new IllegalArgumentException("La position cible (to) ne peut pas être null.");
-        }
+    private Move(
+            IPlayer author,
+            Position from,
+            Position to,
+            int count,
+            List<Integer> drops,
+            PieceKind placementType) {
+        Objects.requireNonNull(to, "to ne peut pas être null");
+        this.author = author;
         this.from = from;
         this.to = to;
         this.count = count;
         this.drops = (drops == null ? Collections.emptyList() : List.copyOf(drops));
-        this.isCapstone = isCapstone;
-        this.isStanding = isStanding;
-        this.isPlacement = isPlacement;
+        this.placementType = placementType;
     }
 
+    // --- Factory methods ---
 
-    /**
-     * Crée un Move de placement (flat ou standing).
-     * @param to            position où l’on veut poser la nouvelle pièce <br>
-     * @param standingStone true pour une stone debout, false pour une stone plate <br>
-     * @return un Move configuré pour un placement (isPlacement=true, isCapstone=false, isStanding selon param)
-     */
-    public static Move placementStone(Position to, boolean standingStone) {
+    public static Move placementStone(IPlayer player, Position to, boolean standing) {
         return new Move(
+                player,
                 null,
                 to,
                 1,
                 Collections.emptyList(),
-                false,
-                standingStone,
-                true
+                standing ? PieceKind.STANDING : PieceKind.FLAT
         );
     }
 
-    /**
-     * Crée un Move de placement de capstone.
-     * @param to position où l’on veut poser le capstone
-     * @return un Move configuré pour un placement de capstone (isCapstone=true, isStanding=false)
-     */
-    public static Move placementCapstone(Position to) {
-        Objects.requireNonNull(to, "Position cible ne peut pas être null");
+    public static Move placementCapstone(IPlayer player, Position to) {
         return new Move(
+                player,
                 null,
                 to,
                 1,
                 Collections.emptyList(),
-                true,
-                false,
-                true
+                PieceKind.CAPSTONE
         );
     }
 
-    /**
-     * Crée un Move de slide (déplacement d’une pile).
-     * @param from   position source (nombre de jetons ≥ count)
-     * @param to     position de la première case visée par le slide
-     * @param count  nombre de jetons à transporter depuis la pile source
-     * @param drops  liste des dépôts à chaque case (doit être non vide, somme(drops) == count)
-     * @return un Move configuré pour un slide (isPlacement=false, isCapstone=false)
-     */
-    public static Move slide(Position from, Position to, int count, List<Integer> drops) {
-        Objects.requireNonNull(from, "Position source ne peut pas être null");
-        Objects.requireNonNull(to, "Position cible ne peut pas être null");
+    public static Move slide(IPlayer player, Position from, Position to, int count, List<Integer> drops) {
+        Objects.requireNonNull(player, "player ne peut pas être null");
+        Objects.requireNonNull(from, "from ne peut pas être null");
         if (count <= 0) {
-            throw new IllegalArgumentException("count doit être strictement positif");
+            throw new IllegalArgumentException("count doit être > 0");
         }
         if (drops == null || drops.isEmpty()) {
-            throw new IllegalArgumentException("drops ne peut pas être vide pour un slide");
+            throw new IllegalArgumentException("drops ne peut pas être vide");
         }
+
         int sum = drops.stream().mapToInt(Integer::intValue).sum();
         if (sum != count) {
-            throw new IllegalArgumentException("La somme des elements de drops doit égaler count");
+            throw new IllegalArgumentException("somme(drops) doit == count");
         }
-        return new Move(
-                from,
-                to,
-                count,
-                drops,
-                false,
-                false,
-                false
-        );
+
+        return new Move(player, from, to, count, drops, null);
+    }
+
+    public Direction direction() {
+        int dRow = Integer.signum(to.row() - from.row());
+        int dCol = Integer.signum(to.col() - from.col());
+        return new Direction(dRow, dCol);
     }
 
     public boolean isPlacement() {
-        return isPlacement;
+        return placementType != null;
     }
 
     public boolean isSlide() {
-        return !isPlacement;
-    }
-
-    public boolean isCapstoneMove() {
-        return isPlacement && isCapstone;
-    }
-
-    public boolean isStandingStoneMove() {
-        return isPlacement && isStanding && !isCapstone;
+        return placementType == null;
     }
 
     public boolean isFlatStoneMove() {
-        return isPlacement && !isStanding && !isCapstone;
+        return placementType == PieceKind.FLAT;
+    }
+
+    public boolean isStandingStoneMove() {
+        return placementType == PieceKind.STANDING;
+    }
+
+    public boolean isCapstoneMove() {
+        return placementType == PieceKind.CAPSTONE;
+    }
+
+    public IPlayer getAuthor() {
+        return author;
     }
 
     public Position getFrom() {
@@ -163,19 +143,18 @@ public final class Move {
         return drops;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Move move = (Move) o;
-        return count == move.count
-                && isCapstone == move.isCapstone
-                && isStanding == move.isStanding
-                && isPlacement == move.isPlacement
-                && Objects.equals(from, move.from)
-                && Objects.equals(to, move.to)
-                && Objects.equals(drops, move.drops);
+    public PieceKind getPlacementType() {
+        return placementType;
     }
 
+    public List<Position> pathPositions() {
+        List<Position> path = new ArrayList<>(drops.size());
+        Position cur = from;
+        Direction dir = direction();
+        for (int i = 0; i < drops.size(); i++) {
+            cur = cur.translate(dir.row(), dir.col());
+            path.add(cur);
+        }
+        return path;
+    }
 }

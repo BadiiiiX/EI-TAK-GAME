@@ -1,8 +1,11 @@
 package fr.esiea.mali.core.model.board;
 
+import fr.esiea.mali.core.model.move.Direction;
+import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.piece.IPiece;
 import fr.esiea.mali.core.model.piece.PieceKind;
 import fr.esiea.mali.core.model.team.TeamColor;
+import fr.esiea.mali.core.service.factory.PieceFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +24,71 @@ public class Board extends AbstractBoard{
         return IntStream.range(0, size)
                 .mapToObj(_ -> new ArrayList<Deque<IPiece>>(Collections.nCopies(size, new ArrayDeque<>())))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Position> getNeighbors(Position pos) {
+        return pos.getNeighbours(this.size);
+    }
+
+    private List<IPiece> pickUpPieces(Position from, int count) {
+        Deque<IPiece> stack = this.getStackAt(from);
+        if(stack.size() < count) {
+            throw new IllegalArgumentException(
+                    "Impossible de pick up " + count + " pièces à " + from +
+                            " (pile ne contient que " + stack.size() + ")");
+        }
+
+        List<IPiece> carried = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            carried.addFirst(stack.pop());
+        }
+
+        return carried;
+    }
+
+    @Override
+    public void applyMove(Move move) {
+        if(move.isPlacement()) {
+            this.applyPlacement(move);
+        } else {
+            this.applySlide(move);
+        }
+    }
+
+    private void applyPlacement(Move move) {
+
+        IPiece piece = PieceFactory.createPlacementPiece(
+                move.getAuthor().getColor(),
+                move.getPlacementType()
+        );
+
+        Position to = move.getTo();
+        Deque<IPiece> stack = this.getStackAt(to);
+        stack.push(piece);
+    }
+
+    private void applySlide(Move move) {
+
+        Position from = move.getFrom();
+        Direction direction = move.direction();
+
+        List<IPiece> carried = pickUpPieces(from, move.getCount());
+
+
+        Position current = move.getTo();;
+        int idx = 0;
+        for(int dropCount : move.getDrops()) {
+
+            Deque<IPiece> stack = this.getStackAt(current);
+            for (int i = idx; i < dropCount; i++) {
+                stack.push(carried.get(idx++));
+            }
+
+            current = current.translate(direction.row(), direction.col());
+
+        }
+
     }
 
     @Override
@@ -53,19 +121,7 @@ public class Board extends AbstractBoard{
                     IPiece top = stack.peekLast();
                     int height = stack.size();
 
-                    // Couleur : W ou B
-                    char ownerInitial = top.getColor() == TeamColor.WHITE ? 'W' : 'B';
-
-                    // Type du sommet : F, S ou C
-                    PieceKind kind = top.getKind();
-                    char kindInitial = switch (kind) {
-                        case PieceKind.CAPSTONE -> 'C';
-                        case PieceKind.STANDING -> 'S';
-                        default -> 'F';
-                    };
-
-                    // Format fixe à 5 caractères : "[hXY]" avec h sur 2 caractères
-                    sb.append(String.format("[%2d%c%c]", height, ownerInitial, kindInitial));
+                    sb.append(String.format("[%2d%s%s]", height, top.getColor(), top.getKind()));
                 }
             }
             sb.append(System.lineSeparator());
