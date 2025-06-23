@@ -4,8 +4,8 @@ import fr.esiea.mali.core.model.team.TeamColor;
 
 public class AIPlayer extends AbstractPlayer {
 
-    public AIPlayer(TeamColor team, String name, PlayerInventory inventory) {
-        super(team, name, inventory);
+    public AIPlayer(PlayerId id, TeamColor team, String name, PlayerInventory inventory) {
+        super(id, team, name, inventory);
     }
 
 }

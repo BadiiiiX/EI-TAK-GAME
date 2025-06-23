@@ -1,7 +1,8 @@
 package fr.esiea.mali.core.event;
 
-import fr.esiea.mali.core.event.events.GameEndedEvent;
-import fr.esiea.mali.core.event.events.GameStartedEvent;
+import fr.esiea.mali.core.model.player.PlayerId;
+import fr.esiea.mali.core.service.impl.events.GameEndedEvent;
+import fr.esiea.mali.core.service.impl.events.GameStartedEvent;
 import fr.esiea.mali.core.model.board.Board;
 import fr.esiea.mali.core.model.board.BoardSize;
 import fr.esiea.mali.core.model.player.HumanPlayer;
@@ -28,7 +29,7 @@ public class EventBusTest {
         bus = new EventBus();
         Board board = new Board(BoardSize.MEDIUM);
         PlayerInventory playerInventory = new PlayerInventory(BoardSize.MEDIUM.getInitialStones(), BoardSize.MEDIUM.getInitialCapstones());
-        HumanPlayer basePlayer = new HumanPlayer(TeamColor.BLACK, "testUser", playerInventory);
+        HumanPlayer basePlayer = new HumanPlayer(new PlayerId(), TeamColor.BLACK, "testUser", playerInventory);
         gameState = new GameState(board, basePlayer);
     }
 

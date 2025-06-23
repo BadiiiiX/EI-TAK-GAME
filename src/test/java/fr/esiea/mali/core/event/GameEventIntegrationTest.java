@@ -1,6 +1,7 @@
 package fr.esiea.mali.core.event;
 
-import fr.esiea.mali.core.event.events.GameStartedEvent;
+import fr.esiea.mali.core.model.player.PlayerId;
+import fr.esiea.mali.core.service.impl.events.GameStartedEvent;
 import fr.esiea.mali.core.model.board.Board;
 import fr.esiea.mali.core.model.board.BoardSize;
 import fr.esiea.mali.core.model.player.HumanPlayer;
@@ -28,8 +29,8 @@ public class GameEventIntegrationTest {
         bus = new EventBus();
 
         Board board = new Board(BoardSize.SMALL);
-        HumanPlayer p1 = new HumanPlayer(TeamColor.WHITE, "firstPlayer", new PlayerInventory(10,1));
-        HumanPlayer p2 = new HumanPlayer(TeamColor.BLACK, "secondPlayer", new PlayerInventory(10,1));
+        HumanPlayer p1 = new HumanPlayer(new PlayerId(), TeamColor.WHITE, "firstPlayer", new PlayerInventory(10,1));
+        HumanPlayer p2 = new HumanPlayer(new PlayerId(), TeamColor.BLACK, "secondPlayer", new PlayerInventory(10,1));
         TurnManager tm = new TurnManager(Arrays.asList(p1,p2));
         RuleEngine ruleEngine = new RuleEngine(RuleSet.defaultRules());
 

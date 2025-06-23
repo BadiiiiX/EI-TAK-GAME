@@ -1,4 +1,4 @@
-package fr.esiea.mali.core.event.events;
+package fr.esiea.mali.core.service.impl.events;
 
 import fr.esiea.mali.core.event.IEvent;
 import fr.esiea.mali.core.model.state.game.IGameState;

@@ -1,7 +1,7 @@
 package fr.esiea.mali.core.service.impl;
 
 import fr.esiea.mali.core.event.EventBus;
-import fr.esiea.mali.core.event.events.GameStartedEvent;
+import fr.esiea.mali.core.service.impl.events.GameStartedEvent;
 import fr.esiea.mali.core.model.board.IBoard;
 import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.player.IPlayer;
@@ -65,5 +65,10 @@ public class Game implements IGame {
     @Override
     public IGameState getState() {
         return state;
+    }
+
+    @Override
+    public EventBus getEventBus() {
+        return this.bus;
     }
 }

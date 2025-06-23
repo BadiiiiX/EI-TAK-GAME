@@ -4,6 +4,8 @@ import fr.esiea.mali.core.model.team.TeamColor;
 
 public interface IPlayer {
 
+    PlayerId getId();
+
     String getName();
 
     TeamColor getColor();

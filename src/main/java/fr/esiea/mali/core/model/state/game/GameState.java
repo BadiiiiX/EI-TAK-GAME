@@ -44,7 +44,7 @@ public class GameState implements IGameState {
     }
 
     public Optional<IPlayer> getWinner() {
-        return winner;
+        return Optional.ofNullable(winner);
     }
 
     public void setBoard(IBoard board) {
