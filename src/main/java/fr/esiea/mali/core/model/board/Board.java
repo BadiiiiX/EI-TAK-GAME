@@ -3,8 +3,6 @@ package fr.esiea.mali.core.model.board;
 import fr.esiea.mali.core.model.move.Direction;
 import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.piece.IPiece;
-import fr.esiea.mali.core.model.piece.PieceKind;
-import fr.esiea.mali.core.model.team.TeamColor;
 import fr.esiea.mali.core.service.factory.PieceFactory;
 
 import java.util.*;
@@ -76,7 +74,7 @@ public class Board extends AbstractBoard{
         List<IPiece> carried = pickUpPieces(from, move.getCount());
 
 
-        Position current = move.getTo();;
+        Position current = move.getTo();
         int idx = 0;
         for(int dropCount : move.getDrops()) {
 

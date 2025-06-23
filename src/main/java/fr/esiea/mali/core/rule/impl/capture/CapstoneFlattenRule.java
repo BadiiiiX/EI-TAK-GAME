@@ -9,7 +9,6 @@ import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.service.factory.PieceFactory;
 
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.List;
 
 /**

@@ -1,6 +1,5 @@
 package fr.esiea.mali.core.model.match;
 
-import fr.esiea.mali.core.model.player.IPlayer;
 import fr.esiea.mali.core.model.player.PlayerId;
 
 import java.util.HashMap;

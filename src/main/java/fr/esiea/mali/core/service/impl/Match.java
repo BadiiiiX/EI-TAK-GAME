@@ -46,12 +46,8 @@ public class Match {
         round.start();
 
         EventBus bus = game.getEventBus();
-        bus.register(PlayerPassedEvent.class, ev -> {
-            managePlayerPassedEvent(ev.playerId());
-        });
-        bus.register(PlayerWonPoints.class, ev -> {
-            this.scoreboard.addVictory(ev.playerId(), ev.score());
-        });
+        bus.register(PlayerPassedEvent.class, ev -> managePlayerPassedEvent(ev.playerId()));
+        bus.register(PlayerWonPoints.class, ev -> this.scoreboard.addVictory(ev.playerId(), ev.score()));
     }
 
     private void managePlayerPassedEvent(PlayerId playerId) {

@@ -1,6 +1,5 @@
 package fr.esiea.mali.core.model.board;
 
-import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.piece.IPiece;
 
 import java.util.*;

@@ -1,7 +1,6 @@
 package fr.esiea.mali.core.model.move;
 
 import fr.esiea.mali.core.model.board.Position;
-import fr.esiea.mali.core.model.piece.IPiece;
 import fr.esiea.mali.core.model.piece.PieceKind;
 import fr.esiea.mali.core.model.player.IPlayer;
 
