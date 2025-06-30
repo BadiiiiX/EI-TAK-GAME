@@ -20,7 +20,9 @@ public class Board extends AbstractBoard{
     protected List<List<Deque<IPiece>>> fillBoard() {
         int size = this.size.getSize();
         return IntStream.range(0, size)
-                .mapToObj(_ -> new ArrayList<Deque<IPiece>>(Collections.nCopies(size, new ArrayDeque<>())))
+                .mapToObj(_ -> IntStream.range(0, size)
+                        .mapToObj(_ -> (Deque<IPiece>) new ArrayDeque<IPiece>())
+                        .collect(Collectors.toList()))
                 .collect(Collectors.toList());
     }
 
@@ -55,6 +57,8 @@ public class Board extends AbstractBoard{
     }
 
     private void applyPlacement(Move move) {
+
+        System.out.println("called");
 
         IPiece piece = PieceFactory.createPlacementPiece(
                 move.getAuthor().getColor(),
@@ -110,6 +114,7 @@ public class Board extends AbstractBoard{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+
         for (int r = 0; r < size.getSize(); r++) {
             for (int c = 0; c < size.getSize(); c++) {
                 Deque<IPiece> stack = board.get(r).get(c);

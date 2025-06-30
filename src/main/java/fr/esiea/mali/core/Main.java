@@ -20,25 +20,26 @@ public class Main {
         printState(state);
 
         try {
-            Move move1 = Move.placementStone(new Position(0, 0), false);
+            Move move1 = Move.placementStone(state.getCurrentPlayer(), new Position(0, 0), false);
             System.out.println("\nJoueur " + state.getCurrentPlayer().getColor() + " joue : " + move1);
             game.playMove(move1);
             state = game.getState();
             printState(state);
 
-            Move move2 = Move.placementStone(new Position(1, 0), true);
+            Move move2 = Move.placementStone(state.getCurrentPlayer(), new Position(1, 0), true);
             System.out.println("\nJoueur " + state.getCurrentPlayer().getColor() + " joue : " + move2);
             game.playMove(move2);
             state = game.getState();
             printState(state);
 
-            Move move3 = Move.placementCapstone(new Position(2, 0));
+            Move move3 = Move.placementCapstone(state.getCurrentPlayer(), new Position(2, 0));
             System.out.println("\nJoueur " + state.getCurrentPlayer().getColor() + " joue : " + move3);
             game.playMove(move3);
             state = game.getState();
             printState(state);
 
             Move move4 = Move.slide(
+                    state.getCurrentPlayer(),
                     new Position(0, 0),
                     new Position(0, 2),
                     1,

@@ -4,6 +4,7 @@ import fr.esiea.mali.core.event.EventBus;
 import fr.esiea.mali.core.model.board.Board;
 import fr.esiea.mali.core.model.board.BoardSize;
 import fr.esiea.mali.core.model.player.HumanPlayer;
+import fr.esiea.mali.core.model.team.TeamColor;
 import fr.esiea.mali.core.rule.engine.RuleEngine;
 import fr.esiea.mali.core.rule.engine.RuleSet;
 import fr.esiea.mali.core.service.impl.Game;
@@ -26,4 +27,12 @@ public class GameFactory {
         return new Game(board, engine, turnManager, eventBus);
     }
 
-}
+    public static Game create(BoardSize size, String firstPlayer, String secondPlayer) {
+
+        HumanPlayer playerOne = PlayerFactory.create(firstPlayer, TeamColor.WHITE, size);
+        HumanPlayer playerTwo = PlayerFactory.create(secondPlayer, TeamColor.BLACK, size);
+
+        return GameFactory.create(size, playerOne, playerTwo);
+    }
+
+    }
