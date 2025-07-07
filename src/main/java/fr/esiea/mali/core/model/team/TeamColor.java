@@ -1,8 +1,10 @@
 package fr.esiea.mali.core.model.team;
 
+import java.awt.*;
+
 public enum TeamColor {
-    BLACK(255, 255, 255),
-    WHITE(0, 0, 0);
+    BLACK(0, 0, 0),
+    WHITE(255, 255, 255);
 
     TeamColor(int red, int green, int blue) {
         this.red = red;
@@ -24,6 +26,10 @@ public enum TeamColor {
 
     public int getBlue() {
         return blue;
+    }
+
+    public Color toAWT() {
+        return new Color(this.red, this.green, this.blue);
     }
 
     @Override

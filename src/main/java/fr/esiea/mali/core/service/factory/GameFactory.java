@@ -14,25 +14,34 @@ import java.util.Arrays;
 
 public class GameFactory {
 
-    public static Game create(BoardSize size, HumanPlayer firstPlayer, HumanPlayer secondPlayer) {
-
+    public static Game create(BoardSize size, HumanPlayer firstPlayer, HumanPlayer secondPlayer, EventBus eventBus) {
         Board board = BoardFactory.create(size);
 
         RuleSet ruleSet = RuleSet.defaultRules();
         RuleEngine engine = new RuleEngine(ruleSet);
 
         TurnManager turnManager = new TurnManager(Arrays.asList(firstPlayer, secondPlayer));
-        EventBus  eventBus = new EventBus();
 
         return new Game(board, engine, turnManager, eventBus);
     }
 
-    public static Game create(BoardSize size, String firstPlayer, String secondPlayer) {
+    public static Game create(BoardSize size, HumanPlayer firstPlayer, HumanPlayer secondPlayer) {
+        EventBus eventBus = new EventBus();
 
+        return GameFactory.create(size, firstPlayer, secondPlayer, eventBus);
+    }
+
+    public static Game create(BoardSize size, String firstPlayer, String secondPlayer, EventBus eventBus) {
         HumanPlayer playerOne = PlayerFactory.create(firstPlayer, TeamColor.WHITE, size);
         HumanPlayer playerTwo = PlayerFactory.create(secondPlayer, TeamColor.BLACK, size);
 
-        return GameFactory.create(size, playerOne, playerTwo);
+        return GameFactory.create(size, playerOne, playerTwo, eventBus);
     }
 
+    public static Game create(BoardSize size, String firstPlayer, String secondPlayer) {
+        EventBus eventBus = new EventBus();
+
+        return GameFactory.create(size, firstPlayer, secondPlayer, eventBus);
     }
+
+}

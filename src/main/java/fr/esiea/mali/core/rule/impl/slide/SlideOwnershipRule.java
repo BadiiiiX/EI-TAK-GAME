@@ -19,7 +19,7 @@ public class SlideOwnershipRule implements MoveValidator {
         Deque<IPiece> stack = state.getBoard().getStackAt(move.getFrom());
         TeamColor actualColor = move.getAuthor().getColor();
         if (stack.isEmpty() || stack.peekLast().getColor() != actualColor) {
-            throw new InvalidMoveException("Vous ne contrôlez pas la pile à " + move.getFrom());
+            throw new InvalidMoveException("You don't control this stack.");
         }
     }
 }

@@ -1,6 +1,5 @@
 package fr.esiea.mali.core.model.board;
 
-import fr.esiea.mali.core.model.move.Direction;
 import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.piece.IPiece;
 import fr.esiea.mali.core.service.factory.PieceFactory;
@@ -31,22 +30,6 @@ public class Board extends AbstractBoard{
         return pos.getNeighbours(this.size);
     }
 
-    private List<IPiece> pickUpPieces(Position from, int count) {
-        Deque<IPiece> stack = this.getStackAt(from);
-        if(stack.size() < count) {
-            throw new IllegalArgumentException(
-                    "Impossible de pick up " + count + " pièces à " + from +
-                            " (pile ne contient que " + stack.size() + ")");
-        }
-
-        List<IPiece> carried = new ArrayList<>(count);
-        for (int i = 0; i < count; i++) {
-            carried.addFirst(stack.pop());
-        }
-
-        return carried;
-    }
-
     @Override
     public void applyMove(Move move) {
         if(move.isPlacement()) {
@@ -57,9 +40,6 @@ public class Board extends AbstractBoard{
     }
 
     private void applyPlacement(Move move) {
-
-        System.out.println("called");
-
         IPiece piece = PieceFactory.createPlacementPiece(
                 move.getAuthor().getColor(),
                 move.getPlacementType()
@@ -72,25 +52,28 @@ public class Board extends AbstractBoard{
 
     private void applySlide(Move move) {
 
-        Position from = move.getFrom();
-        Direction direction = move.direction();
+        Position cur = move.getFrom();
+        int dRow = Integer.signum(move.getTo().row() - cur.row());
+        int dCol = Integer.signum(move.getTo().col() - cur.col());
 
-        List<IPiece> carried = pickUpPieces(from, move.getCount());
-
-
-        Position current = move.getTo();
-        int idx = 0;
-        for(int dropCount : move.getDrops()) {
-
-            Deque<IPiece> stack = this.getStackAt(current);
-            for (int i = idx; i < dropCount; i++) {
-                stack.push(carried.get(idx++));
-            }
-
-            current = current.translate(direction.row(), direction.col());
-
+        Deque<IPiece> src = getStackAt(move.getFrom());
+        List<IPiece> carried = new ArrayList<>();
+        for (int i = 0; i < move.getCount(); i++) {
+            carried.add(src.removeLast());
         }
 
+        int idx = 0;
+        for (int drop : move.getDrops()) {
+            cur = cur.translate(dRow, dCol);
+            if (!isInside(cur)) {
+                throw new IllegalStateException("Slide out of bounds at " + cur);
+            }
+            Deque<IPiece> stack = getStackAt(cur);
+
+            for (int i = 0; i < drop; i++) {
+                stack.addLast(carried.get(idx++));
+            }
+        }
     }
 
     @Override

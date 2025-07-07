@@ -31,11 +31,7 @@ public class RuleEngine {
     private void processVictory(IGameState state) {
         for (VictoryCondition victoryCondition : ruleSet.getVictoryConditions()) {
             Optional<IPlayer> hasWinner = victoryCondition.checkVictory(state);
-            if (hasWinner.isPresent()) {
-                IPlayer winner = hasWinner.get();
-                state.setWinner(winner);
-                //todo create win event
-            }
+            hasWinner.ifPresent(state::setWinner);
         }
     }
 

@@ -6,14 +6,14 @@ import fr.esiea.mali.core.rule.api.MoveValidator;
 import fr.esiea.mali.core.rule.api.exceptions.InvalidMoveException;
 
 /**
- * @Rule : Placement can be operated only on empty stack
+ * @Rule : Placement can be operated only on an empty stack
  */
 public class PlacementOnEmptyRule implements MoveValidator {
     @Override
     public void validate(IGameState state, Move move) {
         if (!move.isPlacement()) return;
         if (!state.getBoard().getStackAt(move.getTo()).isEmpty()) {
-            throw new InvalidMoveException("Case déjà occupée");
+            throw new InvalidMoveException("Stack is not empty.");
         }
     }
 }

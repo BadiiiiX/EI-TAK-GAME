@@ -25,7 +25,7 @@ public class SlideCapstoneFlipRule implements MoveValidator {
             int lastDrop = move.getDrops().get(path.size() - 1);
 
             if(lastDrop != 1) {
-                throw new InvalidMoveException("Seulement une Capstone seule peut renverser un Menhir.");
+                throw new InvalidMoveException("Only a capstone can be flipped on a standing piece.");
             }
         }
     }

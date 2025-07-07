@@ -1,9 +1,10 @@
 package fr.esiea.mali.core.model.match;
 
-import fr.esiea.mali.core.model.match.events.PlayerPassedEvent;
+import fr.esiea.mali.core.model.match.exceptions.TimeLimitExceededException;
 import fr.esiea.mali.core.model.move.Move;
 import fr.esiea.mali.core.model.player.IPlayer;
 import fr.esiea.mali.core.model.player.PlayerId;
+import fr.esiea.mali.core.model.player.event.PlayerWonRound;
 import fr.esiea.mali.core.service.impl.IGame;
 
 import java.util.HashMap;
@@ -12,15 +13,17 @@ import java.util.Map;
 public class Round {
     private final int number;
     private final IGame game;
-    private final long timeLimitMs;
+    private final MatchSettings matchSettings;
     private final Map<PlayerId, Integer> consecutivePasses = new HashMap<>();
     private long lastActionTimestamp;
     private boolean ended = false;
 
-    public Round(int number, IGame game, long timeLimitMs) {
+    public Round(int number, IGame game, MatchSettings matchSettings) {
         this.number = number;
         this.game = game;
-        this.timeLimitMs = timeLimitMs;
+        this.matchSettings = matchSettings;
+
+        game.getTurnManager().getPlayers().forEach(p -> consecutivePasses.put(p.getId(), 0));
     }
 
     public void start() {
@@ -35,24 +38,22 @@ public class Round {
 
         game.playMove(move);
         this.lastActionTimestamp = System.currentTimeMillis();
-
-        consecutivePasses.put(this.getCurrentPlayer().getId(), 0);
     }
 
     public void pass() {
         ensureNotEnded();
-        ensureNotTimedOut();
 
         consecutivePasses.merge(this.getCurrentPlayer().getId(), 1, Integer::sum);
         lastActionTimestamp = System.currentTimeMillis();
-        this.game.getEventBus().post(new PlayerPassedEvent(this.getCurrentPlayer().getId()));  // au lieu de addPenalty()
-        checkEndOfRound();
+
+        ensureNotTooPassed(this.getCurrentPlayer().getId());
     }
 
     public void tick() {
         if (ended) return;
-        if (System.currentTimeMillis() - lastActionTimestamp >= timeLimitMs) {
+        if (System.currentTimeMillis() - lastActionTimestamp >= this.matchSettings.timePerTurnMs()) {
             pass();
+            throw new TimeLimitExceededException("Time limit exceeded");
         }
     }
 
@@ -64,11 +65,6 @@ public class Round {
         return game.getState().getCurrentPlayer();
     }
 
-    public void checkEndOfRound() {
-        if (consecutivePasses.getOrDefault(this.getCurrentPlayer().getId(), 0) >= 3) {
-            this.end();
-        }
-    }
 
     private void ensureNotEnded() {
         if (ended) {
@@ -76,10 +72,28 @@ public class Round {
         }
     }
 
-    private void ensureNotTimedOut() {
-        if (System.currentTimeMillis() - lastActionTimestamp >= timeLimitMs) {
-            throw new IllegalStateException("Time limit exceeded for round " + number);
+    private void ensureNotTooPassed(PlayerId playerId) {
+        if(consecutivePasses.getOrDefault(playerId, 0) >= 3) {
+
+            var actualPlayer = this.getCurrentPlayer();
+            var otherPlayer = this.getGame().getState().getPlayers().stream().filter(p -> !p.getId().equals(actualPlayer.getId())).findFirst().orElseThrow();
+
+            this.game.getEventBus().post(new PlayerWonRound(otherPlayer, this.getGame().getState()));
         }
     }
 
+    private void ensureNotTimedOut() {
+        if (System.currentTimeMillis() - lastActionTimestamp >= this.matchSettings.timePerTurnMs()) {
+            throw new TimeLimitExceededException("Time limit exceeded");
+        }
+    }
+
+    public IGame getGame() {
+        return game;
+    }
+
+    public long timeLeft() {
+        long elapsed = System.currentTimeMillis() - lastActionTimestamp;
+        return this.matchSettings.timePerTurnMs() - elapsed;
+    }
 }

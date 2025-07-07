@@ -7,84 +7,87 @@ import java.util.Deque;
 import java.util.List;
 
 /**
- * Interface décrivant le plateau de jeu Tak.
- * Un plateau est une grille N×N de piles de pièces (Deque<IPiece>).
+ * Interface describing the Tak game board.
+ * A board is an N×N grid of piece stacks (Deque<IPiece>).
+ * 
+ * @author Mehdi A.
  */
 public interface IBoard {
 
     /**
-     * @return la dimension du plateau (N pour un plateau N×N)
+     * Returns the dimension of the board.
+     * 
+     * @return the size of the board (N for an N×N board)
      */
     int getSize();
 
+    /**
+     * Returns the internal representation of the board.
+     * 
+     * @return the 2D list of piece stacks
+     */
     List<List<Deque<IPiece>>> getBoard();
 
     /**
-     * Vérifie si une position est à l'intérieur des limites (0 ≤ row,col < N).
+     * Checks if a position is inside the board boundaries (0 ≤ row,col < N).
      *
-     * @param pos la position à tester
-     * @return true si pos est valide
+     * @param pos the position to check
+     * @return true if the position is valid
      */
     boolean isInside(Position pos);
 
     /**
-     * Récupère la pile de pièces à la position donnée.
+     * Retrieves the stack of pieces at the given position.
      *
-     * @param pos la position cible
-     * @return la Deque d'IPiece en (row, col)
-     * @throws IndexOutOfBoundsException si pos n'est pas dans le plateau
+     * @param pos the target position
+     * @return the Deque of IPiece at (row, col)
+     * @throws IndexOutOfBoundsException if the position is not on the board
      */
     Deque<IPiece> getStackAt(Position pos);
 
     /**
-     * Liste les positions adjacentes valides (haut, bas, gauche, droite).
+     * Lists the valid adjacent positions (up, down, left, right).
      *
-     * @param pos la position de départ
-     * @return liste de positions voisines
+     * @param pos the starting position
+     * @return list of neighboring positions
      */
     List<Position> getNeighbors(Position pos);
 
     /**
-     * Retire un certain nombre de pièces du sommet de la pile et les renvoie ordonnées bas→haut.
+     * Successively places pieces according to a drop pattern, starting from a position and
+     * moving in a direction defined by Move.
      *
-     * @param from  position source
-     * @param count nombre de pièces à prendre
-     * @return liste de pièces extraites
-     */
-    //List<IPiece> pickUpPieces(Position from, int count);
-
-    /**
-     * Pose successivement des pièces selon un schéma de drops, à partir d'une position et
-     * en avançant dans une direction définie par Move.
-     *
-     * @param toDrop liste de pièces transportées (ordre bas→haut)
-     * @param to     position de départ du dépôt
-     * @param drops  liste des quantités déposées case par case
+     * @param toDrop list of carried pieces (bottom to top order)
+     * @param to     starting position for the drop
+     * @param drops  list of quantities to drop on each square
      */
     void dropPieces(List<IPiece> toDrop, Position to, List<Integer> drops);
 
     /**
-     * Applique un Move complet : placement ou slide.
+     * Applies a complete Move: placement or slide.
      *
-     * @param move le coup à appliquer
+     * @param move the move to apply
      */
     void applyMove(Move move);
 
     /**
-     * Clone profond du plateau, incluant toutes les piles et pièces.
+     * Creates a deep clone of the board, including all stacks and pieces.
      *
-     * @return nouvelle instance indépendante
+     * @return new independent instance
      */
     IBoard copy();
 
     /**
-     * @return true si toutes les piles sont vides
+     * Checks if the board is empty.
+     * 
+     * @return true if all stacks are empty
      */
     boolean isEmpty();
 
     /**
-     * @return le nombre total de pièces présentes sur le plateau
+     * Counts the total number of pieces on the board.
+     * 
+     * @return the total number of pieces present on the board
      */
     int totalPiecesOnBoard();
 }
-

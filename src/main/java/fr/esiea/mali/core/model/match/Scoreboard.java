@@ -18,7 +18,11 @@ public class Scoreboard {
     }
 
     public int getScore(PlayerId playerId) {
-        return scores.get(playerId);
+        return scores.getOrDefault(playerId, 0);
+    }
+
+    public Map<PlayerId, Integer> getAllScores() {
+        return scores;
     }
 
 }

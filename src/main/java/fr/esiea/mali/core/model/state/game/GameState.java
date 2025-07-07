@@ -5,6 +5,7 @@ import fr.esiea.mali.core.model.player.IPlayer;
 import fr.esiea.mali.core.model.state.history.History;
 import fr.esiea.mali.core.model.state.history.IHistory;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -12,27 +13,23 @@ public class GameState implements IGameState {
 
     private IBoard board;
     private IPlayer currentPlayer;
+    private final List<IPlayer> players;
     private final IHistory history;
     private IPlayer winner = null;
 
-    public GameState(IBoard board, IPlayer currentPlayer) {
+    public GameState(IBoard board, List<IPlayer> players, IPlayer currentPlayer) {
         this.setBoard(board);
         this.setCurrentPlayer(currentPlayer);
         this.history = new History();
-    }
-
-    private GameState(IBoard board,
-                      IPlayer currentPlayer,
-                      History history,
-                      IPlayer winner) {
-        this.board = board;
-        this.currentPlayer = currentPlayer;
-        this.history = history;
-        this.winner = winner;
+        this.players = players;
     }
 
     public IBoard getBoard() {
         return board;
+    }
+
+    public List<IPlayer> getPlayers() {
+        return this.players;
     }
 
     public IPlayer getCurrentPlayer() {

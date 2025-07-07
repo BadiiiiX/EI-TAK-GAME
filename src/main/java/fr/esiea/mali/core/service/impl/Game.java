@@ -1,6 +1,9 @@
 package fr.esiea.mali.core.service.impl;
 
 import fr.esiea.mali.core.event.EventBus;
+import fr.esiea.mali.core.model.move.events.MovePlayedEvent;
+import fr.esiea.mali.core.model.player.event.PlayerWonRound;
+import fr.esiea.mali.core.service.impl.events.GameEndedEvent;
 import fr.esiea.mali.core.service.impl.events.GameStartedEvent;
 import fr.esiea.mali.core.model.board.IBoard;
 import fr.esiea.mali.core.model.move.Move;
@@ -28,22 +31,32 @@ public class Game implements IGame {
 
     @Override
     public void start() {
-        this.state = new GameState(board.copy(), turnManager.getCurrentPlayer());
+        this.state = new GameState(board.copy(), turnManager.getPlayers(), turnManager.getCurrentPlayer());
         bus.post(new GameStartedEvent(this.getState()));
+    }
+
+    public void changeTurn(Move move) {
+        turnManager.nextPlayer();
+        state.setCurrentPlayer(turnManager.getCurrentPlayer());
+
+
+        bus.post(new MovePlayedEvent(move, state));
     }
 
     @Override
     public void playMove(Move move) {
 
-        //TODO PROCESS PLAY (validation, board process...)
         ruleEngine.processMove(state, move);
+
+        state.getWinner().ifPresent(winner -> {
+            bus.post(new PlayerWonRound(winner, state));
+            bus.post(new GameEndedEvent(state));
+        });
 
         state.getHistory().record(move);
 
-        turnManager.nextPlayer();
-        state.setCurrentPlayer(turnManager.getCurrentPlayer());
 
-        //TODO CHECK WIN
+        changeTurn(move);
     }
 
     @Override
@@ -70,5 +83,9 @@ public class Game implements IGame {
     @Override
     public EventBus getEventBus() {
         return this.bus;
+    }
+
+    public TurnManager getTurnManager() {
+        return turnManager;
     }
 }

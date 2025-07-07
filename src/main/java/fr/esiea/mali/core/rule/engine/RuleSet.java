@@ -5,11 +5,14 @@ import fr.esiea.mali.core.rule.api.MoveValidator;
 import fr.esiea.mali.core.rule.api.VictoryCondition;
 import fr.esiea.mali.core.rule.impl.capture.CapstoneFlattenRule;
 import fr.esiea.mali.core.rule.impl.placement.PlacementOnEmptyRule;
+import fr.esiea.mali.core.rule.impl.placement.PlacementWithExistingPieceRule;
 import fr.esiea.mali.core.rule.impl.slide.SlideCapstoneFlipRule;
 import fr.esiea.mali.core.rule.impl.slide.SlideChargeLimitRule;
 import fr.esiea.mali.core.rule.impl.slide.SlideOwnershipRule;
 import fr.esiea.mali.core.rule.impl.slide.SlidePathClearRule;
-import fr.esiea.mali.core.rule.impl.victory.ApplyWinCondition;
+import fr.esiea.mali.core.rule.impl.victory.AlignFlatWinCondition;
+import fr.esiea.mali.core.rule.impl.victory.EmptyInventoryWinCondition;
+import fr.esiea.mali.core.rule.impl.victory.FullBoardWinCondition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,7 @@ public class RuleSet {
     public static RuleSet defaultRules() {
         return new RuleSet()
                 .addValidator(new PlacementOnEmptyRule())
+                .addValidator(new PlacementWithExistingPieceRule())
 
                 .addValidator(new SlideOwnershipRule())
                 .addValidator(new SlideChargeLimitRule())
@@ -57,6 +61,8 @@ public class RuleSet {
 
                 .addCaptureRule(new CapstoneFlattenRule())
 
-                .addVictoryCondition(new ApplyWinCondition());
+                .addVictoryCondition(new EmptyInventoryWinCondition())
+                .addVictoryCondition(new FullBoardWinCondition())
+                .addVictoryCondition(new AlignFlatWinCondition());
     }
 }

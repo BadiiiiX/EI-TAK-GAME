@@ -14,7 +14,7 @@ public class SlideChargeLimitRule implements MoveValidator {
         if (!move.isSlide()) return;
         int max = state.getBoard().getSize();
         if (move.getCount() > max) {
-            throw new InvalidMoveException("Trop de jetons déplacés : " + move.getCount() + " > " + max);
+            throw new InvalidMoveException("Too much charge");
         }
     }
 }
